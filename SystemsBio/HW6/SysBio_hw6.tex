@@ -1,0 +1,62 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx,chemarrow}
+\usepackage{ifthen}
+\pagestyle{empty}
+
+\usepackage[]{mcode}
+
+\topmargin -0.6in
+\headsep 0.40in
+\oddsidemargin 0.0in
+\textheight 9.0in
+\textwidth 6.5in
+\newcommand{\mybox}[1]{\fbox{\parbox[h]{0.9\textwidth}{#1}}}
+\newcommand{\beqn}{\begin{eqnarray}}
+\newcommand{\eeqn}{\end{eqnarray}}
+\newcommand{\vf}{\varphi}
+\def \beq {\begin{eqnarray}}
+\def \eeq {\end{eqnarray}}
+\def \beqn {\begin{eqnarray*}}
+\def \eeqn {\end{eqnarray*}}
+\newcommand{\comment}[1]{}
+\newcommand{\solution}[1]{#1}
+\begin{document}
+
+\centerline{\Large \bf Systems Biology, Homework \# 6}
+\vskip 4 pt
+\centerline{\Large \bf Signal Transduction Pathways }
+\vskip 4 pt
+\centerline{\Large  Due Wednesday April 13th 11:59 pm}
+
+\begin{enumerate}
+
+\item {\bf The two-component {\em KdpD/KdpE} signalling pathway.} When cells of the bacterium {\em E. coli} need to increase the rate at which they take up K$^+$ ions from the environment, they increase production of a high affinity K$^+$ uptake system.  Production of this system is under the control of the protein {\em KdpE}, which is the response regulator in a two-component signalling pathway.  {\em KdpE} is activated by a sensor protein called {\em KdpD}.   Activation of {\em KdpE} is a two-step process: first, activated {\em KdpD} undergoes autophosphorylation; next, the phosphate group is transferred to {\em KdpE}.  Inactivation is also mediated by {\em KdpD}; it acts as a phosphatase, removing the phosphate group from activated {\em KdpE}.  In a 2004 paper, Andreas Kremling and his colleagues published a model of the {\em KdpD/KdpE} pathway (Kremling, A., Heerman, R., Centler, F., Jung, K., \& Gilles, E. D. (2004). Analysis of two-component signal transduction by mathematical modeling using the KdpD/KdpE system of Escherichia coli. Biosystems, 78, 23–37).   A simplified version of their model network is
+\beqn
+ATP + \mbox{{\em KdpD}} &\autorightarrow{$k_1$}{}& ADP + \mbox{{\em KdpD}}^p \\
+\mbox{{\em KdpD}}^p + \mbox{{\em KdpE}} &\autorightleftharpoons{$k_2$}{$k_{-2}$}& \mbox{{\em KdpD}} + \mbox{{\em KdpE}}^p \\
+\mbox{{\em KdpE}}^p + \mbox{{\em KdpD}} &\autorightarrow{$k_3$}{}& \mbox{{\em KdpE}} + \mbox{{\em KdpD}}+ Pi,
+\eeqn
+where $^p$ indicates phosphorylation, and $Pi$ is a free phosphate group.  The parameter $k_1$ can be used as an input to the system.  
+
+\begin{enumerate}  
+\item Treating the concentration of $ATP$  as constant, write a set of differential equations describing the system behaviour. (Do not include descriptions of the ATP, ADP or Pi dynamics).  Take the total concentrations of the proteins (in the unphosphorylated and phosphorylated states) to be fixed at {\em KdpE}$_T$ and {\em KdpD}$_T$ respectively.
+
+
+\item The parameter values reported by Kremling 
+and colleagues are: (in $\mu$M) [ATP]= 1500, {\em KdpE}$_T$=1, {\em KdpD}$_T$=1, (in $\mu$M$^{-1}$ h$^{-1}$ ) $k_1=0.0029$, $k_2=108$, $k_{-2}=1080$, $k_3=90$.  This value of $k_1$ corresponds to an activated sensor.  Run a simulation from initial condition of inactivity (no phosphorylation).  How long does it take for  the system to reach its steady-state response?  Run another simulation to mimic inactivation of the activated system (i.e.~by decreasing $k_1$ to zero from the active steady state).  Does the system inactivate on the same time-scale?
+
+\item Kremling and colleagues conducted {\em in vitro} experiments on this system at a low ATP level of [ATP]= 100 $\mu$M.  How does this change affect the system behaviour?  Does it impact the activation and inactivation time-scales?
+
+\item How would the system behaviour be different if, instead of {\em KdpD}, an independent phosphatase (with fixed activity level) inactivates $KdpE^p$?    Does the fact that {\em KdpD} act as as both kinase and phosphatase enhance or diminish the system's response?  (Note, only the unphosphorylated form of {\em KdpD} has phosphatase activity.) Confirm your conjecture by simulating a modified model in which an independent phosphatase inactivates $KdpE^p$.  
+
+
+
+\end{enumerate}
+
+
+
+\end{enumerate}
+
+\end{document} 
+
+\newpage

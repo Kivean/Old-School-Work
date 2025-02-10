@@ -1,0 +1,90 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx,chemarrow}
+\usepackage{ifthen}
+\pagestyle{empty}
+
+\usepackage[]{mcode}
+
+\topmargin -0.6in
+\headsep 0.40in
+\oddsidemargin 0.0in
+\textheight 9.0in
+\textwidth 6.5in
+\newcommand{\mybox}[1]{\fbox{\parbox[h]{0.9\textwidth}{#1}}}
+\newcommand{\beqn}{\begin{eqnarray}}
+\newcommand{\eeqn}{\end{eqnarray}}
+\newcommand{\vf}{\varphi}
+\def \beq {\begin{eqnarray}}
+\def \eeq {\end{eqnarray}}
+\def \beqn {\begin{eqnarray*}}
+\def \eeqn {\end{eqnarray*}}
+\newcommand{\comment}[1]{}
+\newcommand{\solution}[1]{#1}
+\begin{document}
+
+\centerline{\Large \bf Systems Biology, Homework \# 7}
+\vskip 4 pt
+\centerline{\Large \bf Models of Gene Regulation}
+\vskip 4 pt
+\centerline{\Large  Due Monday April 25th 11:59 pm}
+
+\begin{enumerate}
+
+\item {\bf Response time of autoinhibitory genes} Consider the product of a constitutively expressed gene as modelled in equation 7.2 in the notes:
+\beq
+\label{eq:ai1}
+\frac{d}{dt} p(t) = \alpha_0 - \delta p(t)
+\eeq
+
+For comparison, consider an autoinhibitory gene whose expression can be modelled as in equation~7.8 in the notes:
+\beq
+\label{eq:ai2}
+\frac{d}{dt} p(t) &=& \alpha \frac{1}{1+p(t)/K} - \delta p(t),
+\eeq
+
+
+
+\begin{enumerate}  
+\item Take $\delta = 1$ (time$^{-1}$) in models~(\ref{eq:ai1}) and~(\ref{eq:ai2})  and let $K=1$ (concentration) for the autoinhibited gene.  Verify that both genes generate the same steady-state protein concentration when $\alpha=\alpha_0(\alpha_0+1)$.  (Hint: substitute $p^{ss}= \alpha_0$ into the autoinhibited model.)
+%you'll need to use the fact that $1+4a^2+4a = (2a+1)^2$.)
+
+\item Simulate the two models with $\alpha_0=5$ and $\alpha=30$ (concentration $\!\cdot\!$ time$^{-1}$).  Take the initial concentrations to be zero.  Verify that, as a result of having a higher maximal expression rate, the autoinhibited gene reaches steady state more quickly than the unregulated gene.
+
+\item How would you expect the response time to be affected by cooperative binding of multiple copies of the repressor?  Verify your conjecture by comparing your results from part (b) with the model
+\beqn
+\frac{d}{dt} p(t) &=& \alpha_2 \frac{1}{1+(p(t)/K)^2} - \delta p(t).
+\eeqn
+Take $\alpha_2 =130$ (concentration $\!\cdot\!$ time$^{-1}$). 
+
+\end{enumerate}
+
+\item {\bf The lac operon: CAP} Consider the model of the lac operon presented in Section 7.2.1. Suggest a way to modify Equation (7.11) to include the transcription factor CAP, which represses expression from the lac operon whenever glucose levels are sufficiently high, regardless of the lactose level.
+
+\item {\bf Exploration of Goodwin Oscillator} Recall the generic model of an oscillating autoregulatory gene proposed by Goodwin (equation~7.22):
+\beqn
+\frac{d}{dt} x(t) &=& \frac{a}{k^n+(z(t))^n} - b x(t)  \\
+\frac{d}{dt} y(t) &=& \alpha x(t) - \beta y(t) \\
+\frac{d}{dt} z(t) &=& \gamma y(t) - \delta z(t) 
+\eeqn
+This system exhibits limit-cycle oscillations provided the Hill coefficient $n$ is sufficiently large.  Unfortunately, for reasonable choices of the other parameter values, $n$ has to be chosen very high ($>8$) to ensure oscillatory behaviour.  Modifications that generate oscillations with smaller Hill coefficients are as follows.  (In exploring these models, make sure simulations run for sufficiently long that the asymptotic behaviour is clear.) 
+
+\begin{enumerate}
+\item Taking parameter values as in Figure~7.17, modify the model by adding a fourth step to the activation cascade. (Use dynamics identical to the third step.)  Verify that the additional lag introduced by this fourth component allows the system to exhibit sustained oscillations with  $n<8$. %soln: replicate Z eqn, oscillates with n=6.
+
+\item Returning to the original model, replace the term for degradation of $Z$ by a Michaelis-Menten term: $-\delta z/(K_M+z)$.  Verify that this modified system oscillates with no cooperativity (i.e.~with $n=1$).   Take $a=150$, $k=1$, $b=\alpha=\beta=\gamma=0.2$, $\delta=15$, and $K_M=1$. (Units as in Figure~7.17.)
+
+
+\item (OPTIONAL) Consider a one-state model in which the time-delay caused by the cascade of molecular events is abstracted into an explicit time delay:
+\beqn 
+\frac{d}{dt} x(t) = \frac{a}{k^n+(x(t-\tau))^n} - b x(t). 
+\eeqn 
+Take parameter values $a=10$, $k=1$, $b=0.5$ and $n=4$.  Verify that this one-dimensional model exhibits sustained oscillations when $\tau=3$.  Describe the effects of changing the delay by running simulations with $\tau=2$, $\tau=0.75$ and $\tau=20$. (Units as in Figure~7.17.) Details on simulating delay equations can be found in Appendix~C.
+
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document} 
+
+\newpage
