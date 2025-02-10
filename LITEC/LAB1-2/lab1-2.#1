@@ -1,0 +1,227 @@
+/*  Names: Grayson Gerlich
+    Section: 2
+    Date: 9/19/2018
+    File name: lab1-2
+    Description: lab1-2 Code
+*/
+/*
+  This program demonstrates the use of T0 interrupts. The code will count the
+  number of T0 timer overflows that occur while a slide switch is in the ON position.
+*/
+
+#include <c8051_SDCC.h>// include files. This file is available online
+#include <stdio.h>
+#include <stdlib.h>
+
+//-----------------------------------------------------------------------------
+// Function Prototypes
+//-----------------------------------------------------------------------------
+void Port_Init(void);      // Initialize ports for input and output
+void Timer_Init(void);     // Initialize Timer 0 
+void Interrupt_Init(void); //Initialize interrupts
+void Timer0_ISR(void) __interrupt 1;
+unsigned char random(void);
+void Game(void);
+
+//-----------------------------------------------------------------------------
+// Global Variables
+//-----------------------------------------------------------------------------
+__sbit __at 0xB7 LED0; // LED0, associated with Port 3 Pin 7
+__sbit __at 0xB3 BILED0; // BILED0, associated with Port 3 Pin 3
+__sbit __at 0xB4 BILED1; // BILED1, associated with Port 3 Pin 4
+__sbit __at 0xB6 BUZZER; // BUZZER, associated with Port 3 Pin 6
+__sbit __at 0xA0 SS;   // Slide switch, associated with Port 2 Pin 0
+__sbit __at 0xB0 PB1;  // Push button 1, associated with Port 3, Pin 0
+__sbit __at 0xB1 PB2; // Push button 2, associated with Port 3, Pin 1
+__sbit __at 0xB2 LED1; // LED1, associated with Port 3 Pin 2
+
+unsigned int Counts = 0;
+unsigned char prev = 0;
+unsigned char cur;
+unsigned char rounds;
+unsigned char victories;
+unsigned char defeats;
+unsigned char seed;
+
+//***************
+void main(void)
+{
+    Sys_Init();      // System Initialization
+    Port_Init();     // Initialize ports 2 and 3 
+    Interrupt_Init();
+    Timer_Init();    // Initialize Timer 0 
+
+    putchar(' ');    // the quote fonts may not copy correctly into SiLabs IDE
+    printf("Start\r\n");
+	printf("Feed the grim beast of randomness with a seed!");
+	seed = getchar();
+	srand(seed); //seed rand() for the rest of the program for random gameplay
+
+    while (rounds < 10) /* the following loop prints the number of overflows that occur
+                while the pushbutton is pressed, the BILED is lit while the
+                button is pressed */
+    {
+        while(!SS) // while SS0 is ON (high)
+        {
+			TR0 = 1;     // Timer 0 enabled
+        	Game(); //play ball! :D
+			rounds ++;
+			if (rounds > 9) 
+			{
+				break;
+			}
+		}		
+
+        TR0 = 0;    // Timer 0 disabled
+
+    }
+
+	printf("\r\nYou achieved %i victories! \r\n", victories); //print victories
+	printf("You suffered %i defeats! \r\n", defeats); //print defeats
+
+	while (1) {
+		//do nothing 
+	}
+}
+
+void Game(void)
+{
+	unsigned char gamemode;
+	gamemode = random(); //call randomness code for a random gameplay mode
+
+	if (gamemode == 0)
+	{
+		LED0 = 0; //Turn LED0 on 
+		LED1 = 1;
+		Counts = 0;
+		while (Counts != 338) //wait a second
+		{
+			//do nothing
+		}
+		if (!PB1 && PB2) //just PB1 pushed
+		{
+			BILED0 = 0;
+			BILED1 = 1; //Make BILED green
+			printf("Victory!");
+			victories ++; //increment victories
+		}
+		else
+		{
+			BILED0 = 1; //make BILED red
+			BILED1 = 0;
+			printf("Defeat!");
+			defeats ++; //increment defeats
+		}
+	}
+
+	else if (gamemode == 1)
+	{
+		LED0 = 1; 
+		LED1 = 0; //turn LED1 on
+		Counts = 0;
+		while (Counts != 338) //wait a second
+		{
+			//do nothing
+		}
+		if (!PB2 && PB1) //just PB2 pushed
+		{
+			BILED0 = 0; //make BILED green
+			BILED1 = 1;
+			printf("Victory!");
+			victories ++; //increment victories
+		}
+		else
+		{
+			BILED0 = 1;
+			BILED1 = 0; //make BILED red
+			printf("Defeat!");
+			defeats ++; //increment defeats
+		}
+	}
+	
+	else if (gamemode == 2)
+	{
+		LED0 = 0; //turn LED0 on
+		LED1 = 0; //turn LED1 on
+		Counts = 0;
+		while (Counts != 338) //wait a second
+		{
+			//do nothing
+		}
+		if (!PB2 && !PB1) //both buttons pushed
+		{
+			BILED0 = 0; //make BILED green
+			BILED1 = 1;
+			printf("Victory!");
+			victories ++; //increment victories
+		}
+		else
+		{
+			BILED0 = 1; 
+			BILED1 = 0; //make BILED red
+			printf("Defeat!");
+			defeats ++; //increment defeats
+		}
+	}
+		
+}
+
+//***************
+void Port_Init(void)
+{
+    // Port 3
+  	P3MDOUT |= 0xD8; // set Port 3 output pins to push-pull mode 
+  	P3MDOUT &= 0xFC; // set Port 3 input pins to open drain mode
+  	P3 |= 0x03; // set Port 3 input pins to high impedance state
+
+    // Port 2
+    P2MDOUT |= 0x00; // set Port 2 output pins to push-pull mode 
+  	P2MDOUT &= 0xFE; // set Port 2 input pins to open drain mode 
+  	P2 |= 0x01; // set Port 2 input pins to high impedance state 
+
+}
+
+void Interrupt_Init(void)
+{
+    IE |= 0x02;      // enable Timer0 Interrupt request (by masking)
+    EA = 1;       // enable global interrupts (by sbit)
+}
+//***************
+void Timer_Init(void)
+{
+
+	CKCON |= 0x08;  // Timer0 uses SYSCLK as source
+    TMOD &= 0xF0;   // clear the 4 least significant bits
+    TMOD |= 0x01;   // Timer0 in mode 1
+    TR0 = 0;           // Stop Timer0
+    TMR0 = 0;           // Clear high & low byte of T0
+
+}
+
+
+//***************
+void Timer0_ISR(void) __interrupt 1
+{
+	Counts ++; //incremend counts on each interrupt
+}
+
+/******************************************************************************/
+/*
+  This function demonstrates how to obtain a random integer between 0 and 1 in
+  C. You may modify and use this code to get a random integer between 0 and N.
+*/
+
+/*return a random integer number between 0 and 2*/
+unsigned char random(void)
+{
+	cur = rand()%3;
+	while (cur == prev) //check if the value generated was the last one we used
+	{
+		cur = rand()%3;
+	}
+	prev = cur;
+	return cur;  // rand returns a random number between 0 and 32767.
+                        // the mod operation (%) returns the remainder of 
+                        // dividing this value by 3 and returns the result,
+                        // a value of either 0, 1, or 2.
+}
